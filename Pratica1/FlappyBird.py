@@ -83,8 +83,8 @@ class Passaro:
     def get_mask(self):
         return pygame.mask.from_surface(self.imagem)
     
-    class Cano:
-        DISTANCIA = 200
+class Cano:
+    DISTANCIA = 200
     VELOCIDADE = 5
     def __init__(self, x):
         self.x = x
@@ -117,8 +117,8 @@ class Passaro:
         else:
             return False
         
-        class Chao:
-        VELOCIDADE = 5
+class Chao:
+    VELOCIDADE = 5
     LARGURA = IMAGEM_CHAO.get_width()
     IMAGEM = IMAGEM_CHAO
     def __init__(self, y):
@@ -169,3 +169,31 @@ def main():
                         passaro.pular()
 
 
+        # movimentos
+        for passaro in passaros:
+            passaro.mover()
+        chao.mover()
+        adicionar_cano = False
+        remover_canos = []
+        for cano in canos:
+            for i, passaro in enumerate(passaros):
+                if cano.colidir(passaro):
+                    passaros.pop(i)
+                if not cano.passou and passaro.x > cano.x:
+                    cano.passou = True
+                    adicionar_cano = True
+            cano.mover()
+            if cano.x + cano.CANO_TOPO.get_width() < 0:
+                remover_canos.append(cano)
+        if adicionar_cano:
+            pontos += 1
+            canos.append(Cano(600))
+        for cano in remover_canos:
+            canos.remove(cano)
+        for i, passaro in enumerate(passaros):
+            if (passaro.y + passaro.imagem.get_height()) > chao.y or passaro.y < 0:
+                passaros.pop(i)
+        desenhar_tela(tela, passaros, canos, chao, pontos)
+
+if __name__ == '__main__':
+    main()
